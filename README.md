@@ -1,2 +1,4 @@
-# Hackathon
-## HACKATHON
+# MammogrAID
+
+## Mammogram Scanning Aid
+
