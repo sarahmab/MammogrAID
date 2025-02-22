@@ -57,12 +57,14 @@ def predict():
         return jsonify({
             'predicted_class': predicted_class,
             'cancer_probability': cancer_probability
+
         })
     else:
         return jsonify({'error': 'Image processing failed'}), 400
 
 @app.route('/health', methods=['GET'])
 def health_check():
+    
     return jsonify({'status': 'healthy'})
 
 if __name__ == '__main__':
