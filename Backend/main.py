@@ -1,74 +1,69 @@
+from huggingface_hub import hf_hub_download
+import tensorflow as tf
+import cv2
+import numpy as np
+import json
 from flask import Flask, request, jsonify
-import torch
-from torchvision import transforms
 from PIL import Image
 import io
-import numpy as np
 
 app = Flask(__name__)
 
-# Load the trained PyTorch model
-try:
-    model = torch.load('breast_cancer_model.pt')
-    model.eval()  # Set model to evaluation mode
-except Exception as e:
-    print(f"Error loading model: {e}")
-    model = None
+# Load model
+repo_id = "maiurilorenzo/CBIS-DDSM-CNN"
+model_path = hf_hub_download(repo_id=repo_id, filename="CNN_model.h5")
+model = tf.keras.models.load_model(model_path)
 
-def preprocess_image(img):
-    # Define image transformations
-    preprocess = transforms.Compose([
-        transforms.Resize((224, 224)),  # Resize image
-        transforms.ToTensor(),  # Convert to tensor
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
-    ])
-    
-    # Apply transformations
-    img_tensor = preprocess(img)
-    img_tensor = img_tensor.unsqueeze(0)  # Add batch dimension
-    
-    return img_tensor
+# Load preprocessing info
+preprocessing_path = hf_hub_download(repo_id=repo_id, filename="preprocessing.json")
+with open(preprocessing_path, "r") as f:
+    preprocessing_info = json.load(f)
 
-@app.route('/classify', methods=['POST'])
-def classify_image():
-    if model is None:
-        return jsonify({'error': 'Model not loaded'}), 500
-        
+def load_and_preprocess_image(image_data):
     try:
-        # Check if image file is present in request
-        if 'image' not in request.files:
-            return jsonify({'error': 'No image file provided'}), 400
+        # Convert bytes to numpy array
+        nparr = np.frombuffer(image_data, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
-        # Get the image file from request
-        image_file = request.files['image']
-        img = Image.open(io.BytesIO(image_file.read()))
+        if img is None:
+            raise ValueError("Could not decode image")
         
-        # Preprocess the image
-        processed_image = preprocess_image(img)
-        
-        # Make prediction
-        with torch.no_grad():
-            prediction = model(processed_image)
-            predicted_prob = torch.sigmoid(prediction)  # Assuming binary classification
-            predicted_class = (predicted_prob >= 0.5).int().item()
-            confidence = predicted_prob.item()
-        
-        # Return prediction result
-        return jsonify({
-            'prediction': predicted_class,
-            'confidence': confidence,
-            'status': 'benign' if predicted_class == 0 else 'malignant'
-        })
-    
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, tuple(preprocessing_info["target_size"]), interpolation=cv2.INTER_AREA)
+        img_array = img.astype(np.float32) / 255.0
+
+        return img_array
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Error processing image: {str(e)}")
+        return None
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image provided'}), 400
+    
+    image_file = request.files['image']
+    image_data = image_file.read()
+    
+    img_array = load_and_preprocess_image(image_data)
+    
+    if img_array is not None:
+        img_batch = np.expand_dims(img_array, axis=0)
+        predictions = model.predict(img_batch)
+        
+        cancer_probability = float(predictions[0][0])  # Convert to Python float for JSON serialization
+        predicted_class = "Cancer" if cancer_probability >= 0.5 else "Normal"
+        
+        return jsonify({
+            'predicted_class': predicted_class,
+            'cancer_probability': cancer_probability
+        })
+    else:
+        return jsonify({'error': 'Image processing failed'}), 400
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({
-        'status': 'healthy',
-        'model_loaded': model is not None
-    })
+    return jsonify({'status': 'healthy'})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)
