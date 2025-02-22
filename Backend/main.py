@@ -1,29 +1,33 @@
 from flask import Flask, request, jsonify
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
-import numpy as np
+import torch
+from torchvision import transforms
 from PIL import Image
 import io
+import numpy as np
 
 app = Flask(__name__)
 
-# Load the trained .h5 model
+# Load the trained PyTorch model
 try:
-    model = load_model('breast_cancer_model.h5')
+    model = torch.load('breast_cancer_model.pt')
+    model.eval()  # Set model to evaluation mode
 except Exception as e:
     print(f"Error loading model: {e}")
     model = None
 
 def preprocess_image(img):
-    # Resize image to match model's expected sizing
-    img = img.resize((224, 224))  # Adjust size according to your model's requirements
+    # Define image transformations
+    preprocess = transforms.Compose([
+        transforms.Resize((224, 224)),  # Resize image
+        transforms.ToTensor(),  # Convert to tensor
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
+    ])
     
-    # Convert to array and preprocess
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array / 255.0  # Normalize pixel values
+    # Apply transformations
+    img_tensor = preprocess(img)
+    img_tensor = img_tensor.unsqueeze(0)  # Add batch dimension
     
-    return img_array
+    return img_tensor
 
 @app.route('/classify', methods=['POST'])
 def classify_image():
@@ -43,9 +47,11 @@ def classify_image():
         processed_image = preprocess_image(img)
         
         # Make prediction
-        prediction = model.predict(processed_image)
-        predicted_class = int(np.round(prediction[0][0]))  # Assuming binary classification
-        confidence = float(prediction[0][0])
+        with torch.no_grad():
+            prediction = model(processed_image)
+            predicted_prob = torch.sigmoid(prediction)  # Assuming binary classification
+            predicted_class = (predicted_prob >= 0.5).int().item()
+            confidence = predicted_prob.item()
         
         # Return prediction result
         return jsonify({
@@ -66,4 +72,3 @@ def health_check():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
