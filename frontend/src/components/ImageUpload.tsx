@@ -1,29 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { uploadImage } from "@/services/api";
+import { useState, useEffect } from "react";
+import { uploadImage, testConnection } from "@/services/api";
 
 export default function ImageUpload() {
-  const [prediction, setPrediction] = useState<{
-    predicted_class: string;
-    cancer_probability: number;
-  } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  useEffect(() => {
+    testConnection()
+      .then((result) => console.log("Backend connection test:", result))
+      .catch((err) => console.error("Backend connection failed:", err));
+  }, []);
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     setLoading(true);
     setError(null);
+    setResult(null);
 
     try {
       const result = await uploadImage(file);
-      setPrediction(result);
-    } catch (err) {
-      setError("Failed to process image");
-      console.error(err);
+      setResult(result);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -34,19 +39,19 @@ export default function ImageUpload() {
       <input
         type="file"
         accept="image/*"
-        onChange={handleImageUpload}
+        onChange={handleFileChange}
         className="border p-2 rounded"
+        disabled={loading}
       />
 
       {loading && <p>Processing image...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      {prediction && (
+      {result && (
         <div className="text-center">
-          <p>Prediction: {prediction.predicted_class}</p>
-          <p>
-            Probability: {(prediction.cancer_probability * 100).toFixed(2)}%
-          </p>
+          <h3>Results:</h3>
+          <p>Prediction: {result.predicted_class}</p>
+          <p>Probability: {(result.cancer_probability * 100).toFixed(2)}%</p>
         </div>
       )}
     </div>
