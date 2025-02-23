@@ -8,7 +8,7 @@ MammogrAID streamlines the diagnosis by providing an accurate classification of 
 
 ## Accuracy
 
-MammogrAID uses the [CBIS-DDSM-CNN](https://huggingface.co/maiurilorenzo/CBIS-DDSM-CNN) model that yields an accuracy of 97%. 
+MammogrAID uses the [CBIS-DDSM-CNN](https://huggingface.co/maiurilorenzo/CBIS-DDSM-CNN) model that yields an accuracy of [97%](https://huggingface.co/maiurilorenzo/CBIS-DDSM-CNN#:~:text=Confusion%20Matrix-,Results,-Accuracy%3A%200.9789). 
 
 ## License
 
