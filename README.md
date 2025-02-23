@@ -1,6 +1,6 @@
 # MammogrAID
 
-MammogrAID provides an agentic aid to mammogram diagnosis.
+[MammogrAID](https://github.com/sarahmab/Hackathon/tree/main) provides an agentic aid to mammogram diagnosis.
 
 ## Description
 
