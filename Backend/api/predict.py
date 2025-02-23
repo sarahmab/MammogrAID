@@ -29,6 +29,6 @@ def handler():
     else:
         return jsonify({'error': 'Image processing failed'}), 400
     
-@app.route('/api/health', methods=['GET'])
+@app.route('/api/health', methods=['POST'])
 def health_check():
     return jsonify({'status': 'healthy'})
