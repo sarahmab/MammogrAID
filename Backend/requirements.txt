@@ -1,4 +1,6 @@
+flask==2.0.1
 tensorflow
-flask
-pillow
-numpy 
+opencv-python-headless
+numpy
+Pillow
+huggingface-hub
