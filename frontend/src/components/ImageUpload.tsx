@@ -41,6 +41,7 @@ export default function ImageUpload() {
         accept="image/*"
         onChange={handleFileChange}
         className="border p-2 rounded"
+        aria-label="Upload image"
         disabled={loading}
       />
 
