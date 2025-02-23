@@ -1,4 +1,12 @@
+flask==2.0.1
 tensorflow
+<<<<<<< HEAD
 flask
 pillow
 numpy
+=======
+opencv-python-headless
+numpy
+Pillow
+huggingface-hub
+>>>>>>> 45a1c4e64ea0e24fa636dbbcf489e54a11c5128c

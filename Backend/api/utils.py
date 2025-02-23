@@ -3,14 +3,16 @@ import tensorflow as tf
 import cv2
 import numpy as np
 import json
-from flask import Flask, request, jsonify
 from PIL import Image
 import io
 from flask_cors import CORS
 
+<<<<<<< HEAD:Backend/main.py
 app = Flask(__name__)
 CORS(app)
 
+=======
+>>>>>>> 45a1c4e64ea0e24fa636dbbcf489e54a11c5128c:Backend/api/utils.py
 # Load model
 repo_id = "maiurilorenzo/CBIS-DDSM-CNN"
 model_path = hf_hub_download(repo_id=repo_id, filename="CNN_model.h5")
@@ -37,6 +39,7 @@ def load_and_preprocess_image(image_data):
         return img_array
     except Exception as e:
         print(f"Error processing image: {str(e)}")
+<<<<<<< HEAD:Backend/main.py
         return None
 
 @app.route('/predict', methods=['POST'])
@@ -75,3 +78,6 @@ def test():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+=======
+        return None
+>>>>>>> 45a1c4e64ea0e24fa636dbbcf489e54a11c5128c:Backend/api/utils.py
