@@ -12,4 +12,4 @@ MammogrAID uses the CBIS-DDSM-CNN model that yields an accuracy of 97%.
 
 ## License
 
-CBIS-DDSM-CNN (https://huggingface.co/maiurilorenzo/CBIS-DDSM-CNN)
+[CBIS-DDSM-CNN](https://huggingface.co/maiurilorenzo/CBIS-DDSM-CNN)
