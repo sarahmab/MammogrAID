@@ -3,7 +3,7 @@
 <p align="center">
   <img alt="Brest Cacner Awareness Image" src="https://brookefieldhospital.com/wp-content/uploads/2024/10/Breast-cancer-awareness-month-Background-by-ojosujono96-scaled.jpg"/>
 
-[MammogrAID](https://github.com/sarahmab/Hackathon/tree/main) provides an agentic aid to mammogram diagnosis.
+[MammogrAID](https://github.com/sarahmab/Hackathon/tree/main) provides an agentic aid to breast cancer diagnosis.
 
 ## Description
 
