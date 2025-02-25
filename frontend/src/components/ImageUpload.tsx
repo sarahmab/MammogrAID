@@ -1,7 +1,9 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
-import { uploadImage, testConnection } from "@/services/api";
+// import { uploadImage, testConnection } from "@/services/api"; 
+import { uploadImage, testConnection } from "@/services/mockApi";  // importing mock api functions for now
 
 export default function ImageUpload() {
   const [loading, setLoading] = useState(false);
@@ -25,7 +27,7 @@ export default function ImageUpload() {
     setResult(null);
 
     try {
-      const result = await uploadImage(file);
+      const result = await uploadImage(file);  
       setResult(result);
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
