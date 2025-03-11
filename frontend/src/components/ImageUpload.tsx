@@ -2,8 +2,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// import { uploadImage, testConnection } from "@/services/api"; 
-import { uploadImage, testConnection } from "@/services/mockApi";  // importing mock api functions for now
+import { uploadImage, testConnection } from "@/services/api"; 
+// import { uploadImage, testConnection } from "@/services/mockApi";  // importing mock api functions for now
 
 export default function ImageUpload() {
   const [loading, setLoading] = useState(false);

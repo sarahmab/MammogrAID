@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000";
+const API_URL = "http://localhost:5000/";
 
 interface PredictionResponse {
   predicted_class: string;
@@ -11,9 +11,12 @@ export async function uploadImage(file: File): Promise<PredictionResponse> {
   formData.append("image", file);
 
   try {
-    const response = await fetch(`${API_URL}/predict`, {
+    const response = await fetch(`${API_URL}/api/predict`, {
       method: "POST",
       body: formData,
+      headers: {
+        'Accept': 'application/json',
+      },
     });
 
     if (!response.ok) {
@@ -34,8 +37,14 @@ export async function uploadImage(file: File): Promise<PredictionResponse> {
 
 export async function testConnection(): Promise<{ status: string }> {
   try {
-    const response = await fetch(`${API_URL}/test`);
+    const response = await fetch(`${API_URL}/api/health`, {
+      method: "GET",
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
     if (!response.ok) {
+      console.log(response);
       throw new Error("Failed to connect to backend");
     }
     return await response.json();
