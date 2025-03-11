@@ -35,39 +35,3 @@ def load_and_preprocess_image(image_data):
     except Exception as e:
         print(f"Error processing image: {str(e)}")
         return None
-
-@app.route('/predict', methods=['POST'])
-def predict():
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image provided'}), 400
-    
-    image_file = request.files['image']
-    image_data = image_file.read()
-    
-    img_array = load_and_preprocess_image(image_data)
-    
-    if img_array is not None:
-        img_batch = np.expand_dims(img_array, axis=0)
-        predictions = model.predict(img_batch)
-        
-        cancer_probability = float(predictions[0][0])  # Convert to Python float for JSON serialization
-        predicted_class = "Cancer" if cancer_probability >= 0.5 else "Normal"
-        
-        return jsonify({
-            'predicted_class': predicted_class,
-            'cancer_probability': cancer_probability
-
-        })
-    else:
-        return jsonify({'error': 'Image processing failed'}), 400
-
-@app.route('/health', methods=['GET'])
-def health_check():
-    
-    return jsonify({'status': 'healthy'})
-
-@app.route('/test', methods=['GET'])
-def test():
-    return {'status': 'Backend is connected!'}
-
-

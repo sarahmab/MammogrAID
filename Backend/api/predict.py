@@ -1,9 +1,10 @@
 import numpy as np
 from flask import Flask, request, jsonify
 from utils import load_and_preprocess_image, model
-
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/api/predict', methods=['POST'])
 def handler():
@@ -32,6 +33,10 @@ def handler():
 @app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'healthy'})
+
+@app.route('/api/test', methods=['GET'])
+def test():
+    return "jsonify({'status': 'Backend is connected!'})"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
